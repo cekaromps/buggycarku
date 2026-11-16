@@ -21,8 +21,8 @@ if (typeof window !== "undefined") {
 const ROUTE_COORDS = routeData.route as [number, number][];
 const STOP_DEFS = routeData.stops as { name: string; lng: number; lat: number }[];
 
-const BUGGY_COUNT = 2;
-const SPEED_MPS = 5;
+const BUGGY_COUNT = 3;
+const SPEED_MPS = 15;
 const DWELL_MS = 6000; 
 
 /* ---------- 2. Precompute the loop and each stop's distance along it ---------- */
@@ -464,37 +464,6 @@ export default function BuggyMap() {
           </Marker>
         ))}
       </MapGL>
-
-      <div
-        style={{
-          position: "absolute",
-          top: 12,
-          left: 12,
-          background: "rgba(17,24,39,.92)",
-          color: "#f3f4f6",
-          border: "1px solid rgba(255,255,255,.12)",
-          padding: "10px 14px",
-          borderRadius: 8,
-          fontSize: 14,
-          lineHeight: 1.6,
-        }}
-      >
-        {buggies.map((b) => (
-          <div key={b.id}>
-            <strong>Buggy {b.id}</strong>: {b.status}
-          </div>
-        ))}
-        {selected && leg && (
-          <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid rgba(255,255,255,.18)" }}>
-            <strong>Buggy {selected.id} next route</strong>
-            <br />
-            {selected.dwelling ? "Leaves for" : "Arrives at"} {leg.targetName}
-            <br />
-            {Math.round(leg.meters)} m · ~{formatEta(leg.seconds)}
-          </div>
-        )}
-      </div>
-
       {/* Bottom panel: fixed to the screen (not the map) so it is always visible */}
       <div
         style={{
