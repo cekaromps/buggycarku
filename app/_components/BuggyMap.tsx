@@ -9,10 +9,6 @@ import * as turf from "@turf/turf";
 import "maplibre-gl/dist/maplibre-gl.css";
 import routeData from "./route.json";
 
-// GeoJSON (the blue route line) is processed in a web worker. Next's bundler can break
-// the worker MapLibre builds on the fly ("Worker failed to load"), so load a plain copy
-// from /public instead. Copy it there once:
-//   cp node_modules/maplibre-gl/dist/maplibre-gl-csp-worker.js public/
 if (typeof window !== "undefined") {
   maplibregl.setWorkerUrl("/maplibre-gl-worker.mjs");
 }
@@ -20,11 +16,9 @@ if (typeof window !== "undefined") {
 const ROUTE_COORDS = routeData.route as [number, number][];
 const STOP_DEFS = routeData.stops as { name: string; lng: number; lat: number }[];
 
-const BUGGY_COUNT = 2;
-const SPEED_MPS = 5;
+const BUGGY_COUNT = 3;
+const SPEED_MPS = 15;
 const DWELL_MS = 6000; 
-
-/* ---------- 2. Precompute the loop and each stop's distance along it ---------- */
 
 const LOOP = turf.lineString(ROUTE_COORDS);
 const LOOP_LEN = turf.length(LOOP, { units: "meters" });
@@ -39,7 +33,7 @@ const SAMPLES = Array.from({ length: Math.ceil(LOOP_LEN / SAMPLE_M) }, (_, i) =>
 let prevAlong = -1;
 const STOPS = STOP_DEFS.map((s, i) => {
   if (i === 0) {
-    prevAlong = 0; // the route starts at the first stop
+    prevAlong = 0;
     return { ...s, along: 0 };
   }
   let best = SAMPLES[SAMPLES.length - 1];
@@ -58,9 +52,9 @@ const STOPS = STOP_DEFS.map((s, i) => {
 
 type Buggy = {
   id: number;
-  along: number; // meters from loop start
-  nextIdx: number; // index of the stop it is at or heading to
-  dwellLeft: number; // ms left at the current stop, 0 = moving
+  along: number; 
+  nextIdx: number;
+  dwellLeft: number;
 };
 
 export type BuggyView = {
@@ -77,7 +71,6 @@ function useSimulatedBuggies(): BuggyView[] {
   useEffect(() => {
     const n = STOPS.length;
 
-    // Spread buggies evenly around the loop, each starting parked at a stop
     const buggies: Buggy[] = Array.from({ length: BUGGY_COUNT }, (_, i) => {
       const idx = Math.floor((i * n) / BUGGY_COUNT);
       return { id: i + 1, along: STOPS[idx].along, nextIdx: idx, dwellLeft: DWELL_MS };
@@ -87,7 +80,7 @@ function useSimulatedBuggies(): BuggyView[] {
     let raf = 0;
 
     const tick = (now: number) => {
-      const dtMs = Math.min(now - last, 100); // clamp when the tab was in background
+      const dtMs = Math.min(now - last, 100);
       last = now;
 
       for (const b of buggies) {
@@ -100,10 +93,10 @@ function useSimulatedBuggies(): BuggyView[] {
         } else {
           const step = (SPEED_MPS * dtMs) / 1000;
           const target = STOPS[b.nextIdx].along;
-          const remaining = (target - b.along + LOOP_LEN) % LOOP_LEN; // wraps at loop end
+          const remaining = (target - b.along + LOOP_LEN) % LOOP_LEN;
 
           if (remaining <= step) {
-            b.along = target; // arrived: snap exactly onto the stop and wait
+            b.along = target; 
             b.dwellLeft = DWELL_MS;
           } else {
             b.along = (b.along + step) % LOOP_LEN;
@@ -134,11 +127,6 @@ function useSimulatedBuggies(): BuggyView[] {
 
   return views;
 }
-
-/* ---------- 4. Map ---------- */
-
-// The route lives inside the map style itself, so it is drawn as soon as the map is,
-// with no dependency on React renders or load timing.
 const MAP_STYLE: StyleSpecification = {
   version: 8,
   sources: {
@@ -153,7 +141,6 @@ const MAP_STYLE: StyleSpecification = {
   layers: [
     { id: "osm", type: "raster", source: "osm" },
     {
-      // darker edge
       id: "route-casing",
       type: "line",
       source: "route",
@@ -164,7 +151,6 @@ const MAP_STYLE: StyleSpecification = {
       },
     },
     {
-      // bright blue fill
       id: "route-line",
       type: "line",
       source: "route",
