@@ -57,7 +57,7 @@ export default function Information() {
             {STOPS.map((name, i) => (
               <li key={i} className="relative flex items-center gap-3 pb-5">
                 {/* line connecting this stop to the next one */}
-                <span className="absolute bottom-0 left-[15px] top-8 w-0.5 bg-gradient-to-b from-blue-500 to-blue-500/30" />
+                <span className="absolute bottom-0 left-3.75 top-8 w-0.5 bg-linear-to-b from-blue-500 to-blue-500/30" />
                 <span className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white ring-4 ring-gray-900">
                   {i + 1}
                 </span>

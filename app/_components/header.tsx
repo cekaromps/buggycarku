@@ -8,7 +8,7 @@ export default function Header() {
         <header className="relative w-full shrink-0 overflow-hidden px-4 pb-3 pt-[max(12px,env(safe-area-inset-top))] shadow-lg">
             {/* soft decorative circles */}
             <div className="pointer-events-none absolute -right-6 -top-8 h-28 w-28 rounded-full" />
-            <div className="pointer-events-none absolute -left-8 bottom-[-40px] h-24 w-24 rounded-full" />
+            <div className="pointer-events-none absolute -left-8 -bottom-10 h-24 w-24 rounded-full" />
 
             <div className="relative grid grid-cols-[44px_1fr_44px] items-center">
                 {/* logo in a white badge so it pops on the blue */}
