@@ -1,4 +1,9 @@
+"use client"
+import { redirect } from "next/navigation";
+import { useIsOperating, OPEN_MIN, CLOSE_MIN, fmtTime } from "./operating"
+
 export default function Header() {
+    const operating = useIsOperating();
     return (
         <header className="relative w-full shrink-0 overflow-hidden px-4 pb-3 pt-[max(12px,env(safe-area-inset-top))] shadow-lg">
             {/* soft decorative circles */}
@@ -12,15 +17,20 @@ export default function Header() {
                 </div>
 
                 <div className="text-center">
-                    <h1 className="text-xl font-extrabold tracking-wider text-white drop-shadow">
+                    <h1 className="text-xl font-extrabold tracking-wider text-white drop-shadow" onClick={()=>redirect("/")}>
                         BUGGYCARKU
                     </h1>
                     <div className="mt-0.5 inline-flex items-center gap-1.5 rounded-full bg-black/25 px-2.5 py-0.5 text-[11px] font-semibold text-white">
                         <span className="relative flex h-2 w-2">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                            <span className="relative inline-flex h-2 w-2 rounded-full bg-green-400" />
+                            {operating && (
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                            )}
+                            <span
+                                className={`relative inline-flex h-2 w-2 rounded-full ${operating ? "bg-green-400" : "bg-gray-400"
+                                    }`}
+                            />
                         </span>
-                        LIVE · Campus Shuttle
+                        {operating ? "LIVE · Campus Shuttle" : "OFFLINE · Service ended"}
                     </div>
                 </div>
 
@@ -28,6 +38,7 @@ export default function Header() {
                     type="button"
                     aria-label="Info"
                     className="flex h-11 w-11 items-center justify-center justify-self-end rounded-full bg-white/15 text-white backdrop-blur hover:bg-white/25"
+                    onClick={()=>redirect("/information")}
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
